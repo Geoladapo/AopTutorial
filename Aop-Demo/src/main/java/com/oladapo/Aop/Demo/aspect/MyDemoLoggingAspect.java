@@ -1,33 +1,48 @@
 package com.oladapo.Aop.Demo.aspect;
 
+import com.oladapo.Aop.Demo.Account;
+import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
-import org.aspectj.lang.annotation.Pointcut;
+import org.aspectj.lang.reflect.MethodSignature;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
 
 @Aspect
 @Component
+@Order(2)
 public class MyDemoLoggingAspect {
 
-    @Pointcut("execution(* com.oladapo.Aop.Demo.dao.*.*(..))")
-    private void forDaoPackage() {}
-
-    @Pointcut("execution(* com.oladapo.Aop.Demo.dao.*.get*(..))")
-    private void getter(){}
-
-    @Pointcut("execution(* com.oladapo.Aop.Demo.dao.*.set*(..))")
-    private void setter(){}
-
-    @Pointcut("forDaoPackage() && !(getter() || setter())")
-    private void forDaoPackageNoGetterSetter() {}
-
-    @Before ("forDaoPackageNoGetterSetter()")
-    public void beforeAddAccountAdvice() {
+    @Before("com.oladapo.Aop.Demo.aspect.PointCutAopExpressions.forDaoPackageNoGetterSetter()")
+    public void beforeAddAccountAdvice(JoinPoint theJoinPoint) {
         System.out.println("\n===>>> Executing @Before advice on addAccount()");
+
+        // display the method signature
+        MethodSignature methodSignature = (MethodSignature) theJoinPoint.getSignature();
+        System.out.println("Method: " + methodSignature);
+
+        // display the arguments to the method
+        Object[] args = theJoinPoint.getArgs();
+        for (Object tempArg : args) {
+            System.out.println(tempArg);
+
+            if(tempArg instanceof Account) {
+                Account theAccount = (Account) tempArg;
+                System.out.println("account name: " + theAccount.getName());
+                System.out.println("account level: " + theAccount.getLevel());
+            }
+        }
     }
 
-    @Before ("forDaoPackageNoGetterSetter()")
-    public void performApiAnalytics() {
-        System.out.println("\n===>>> Performing API analytics");
+    @AfterReturning(
+            pointcut = "execution(* com.oladapo.Aop.Demo.dao.AccountDao.findAccounts(..))",
+            returning = "result")
+    public void afterReturningFindAccountAdvice(JoinPoint theJoinPoint, List<Account> result){
+        String method = theJoinPoint.getSignature().toShortString();
+        System.out.println("\n===>>> Executing @AfterReturning on method: " + method);
+        System.out.println("\n===>>> result is: " + result);
     }
 }

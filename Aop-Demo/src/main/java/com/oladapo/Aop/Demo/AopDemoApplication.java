@@ -7,6 +7,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import java.util.List;
+
 @SpringBootApplication
 public class AopDemoApplication {
 
@@ -18,14 +20,29 @@ public class AopDemoApplication {
     public CommandLineRunner commandLineRunner(AccountDao theAccountDAO,
                                                MembershipDao theMembershipDAO) {
         return runner -> {
-            demoTheBeforeAdvice(theAccountDAO, theMembershipDAO);
+//            demoTheBeforeAdvice(theAccountDAO, theMembershipDAO);
+            demoTheAfterReturningAdvice(theAccountDAO);
         };
+    }
+
+    private void demoTheAfterReturningAdvice(AccountDao theAccountDAO) {
+        List<Account> theAccounts = theAccountDAO.findAccounts();
+
+        System.out.println("\n\nMain program: demoTheAfterReturningAdvice");
+        System.out.println("------");
+
+        System.out.println(theAccounts);
+
+        System.out.println("\n");
     }
 
     private void demoTheBeforeAdvice(AccountDao theAccountDAO,
                                      MembershipDao theMembershipDAO) {
 
         Account account = new Account();
+        account.setName("Madhu");
+        account.setLevel("Platinum");
+
         theAccountDAO.addAccount(account, true);
         theMembershipDAO.addSillyMember();
 

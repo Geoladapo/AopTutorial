@@ -2,10 +2,7 @@ package com.oladapo.Aop.Demo.dao;
 
 import com.oladapo.Aop.Demo.Account;
 
-import java.util.List;
-
 public interface AccountDao {
-    List<Account> findAccounts();
     void addAccount(Account theAccount, boolean vipFlag);
     public String getName();
     public void setName(String name);
