@@ -6,6 +6,7 @@ import java.util.List;
 
 public interface AccountDao {
     List<Account> findAccounts();
+    List<Account> findAccounts(boolean tripWire);
     void addAccount(Account theAccount, boolean vipFlag);
     public String getName();
     public void setName(String name);
