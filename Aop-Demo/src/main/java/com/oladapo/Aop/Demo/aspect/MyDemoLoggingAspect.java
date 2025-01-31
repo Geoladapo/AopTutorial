@@ -2,10 +2,8 @@ package com.oladapo.Aop.Demo.aspect;
 
 import com.oladapo.Aop.Demo.Account;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
-import org.aspectj.lang.annotation.AfterThrowing;
-import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.*;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -69,5 +67,41 @@ public class MyDemoLoggingAspect {
         System.out.println("\n===>>> Executing @AfterThrowing on method: " + method);
 
         System.out.println("\n===>>> The exception is: " + theExc);
+    }
+
+    @After("execution(* com.oladapo.Aop.Demo.dao.AccountDao.findAccounts(..))")
+    public void afterFinallyFindAccountsAdvice(JoinPoint theJoinPoint) {
+        String method = theJoinPoint.getSignature().toShortString();
+        System.out.println("\n===>>> Executing @After (Finally) on method: " + method);
+    }
+
+    @Around("execution(* com.oladapo.Aop.Demo.service.*.getFortune(..))")
+    public Object aroundGetFortune(
+            ProceedingJoinPoint theProceedingJoinPoint) throws Throwable {
+
+
+        // print out method we are advising on
+        String method = theProceedingJoinPoint.getSignature().toShortString();
+        System.out.println("\n===>>> Executing @Around on method: " + method);
+
+        // get begin timestamp
+        long begin = System.currentTimeMillis();
+
+        //now, let's execute the method
+        Object result = null;
+        try {
+            result = theProceedingJoinPoint.proceed();
+        } catch (Exception exc) {
+            System.out.println(exc.getMessage());
+            throw exc;
+        }
+
+        // get end timestamp
+        long end = System.currentTimeMillis();
+
+        // compute duration and display it
+        long duration = end - begin;
+        System.out.println("\n===>>> Duration: " + duration / 1000.0 + "s");
+        return result;
     }
 }
